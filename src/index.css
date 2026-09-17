@@ -1,0 +1,383 @@
+@import 'tailwindcss';
+@source "./**/*.{ts,tsx}";
+
+/* Fonts are bundled from npm, so the site needs no network at runtime. */
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/caveat';
+
+/* ------------------------------------------------------------------ *
+ * Design tokens — warm, cream, premium. No neon, no hearts, no balloons.
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-cream-50: #f7efe6;
+  --color-cream-100: #eee0d1;
+  --color-cream-200: #d6c3b2;
+  --color-peach: #f6b58a;
+  --color-peach-deep: #e8927c;
+  --color-rose: #e8927c;
+  --color-rose-deep: #d06a52;
+  --color-lavender: #ab99d6;
+  --color-lavender-deep: #8c77be;
+  --color-sage: #8baf7f;
+  --color-sage-deep: #5b7e50;
+  --color-gold: #e8c27e;
+  --color-gold-deep: #c9a055;
+  --color-ink: #2e2622;
+  --color-ink-soft: #6f615a;
+  --color-night: #14100e;
+
+  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-hand: 'Caveat Variable', 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+
+  --radius-card: 1.5rem;
+  --radius-blob: 2.25rem;
+
+  --shadow-soft: 0 18px 50px -24px rgba(0, 0, 0, 0.6);
+  --shadow-lift: 0 34px 70px -32px rgba(0, 0, 0, 0.8);
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Per-chapter moods. Restful, warm, luxurious. Easy on the eyes.
+ * ------------------------------------------------------------------ */
+[data-mood='warm'] {
+  --bg-a: #1a1512;
+  --bg-b: #281d17;
+  --bg-c: #140d0a;
+  --mood-accent: #e8927c;
+  --mood-ink: #f7efe6;
+}
+[data-mood='playful'] {
+  --bg-a: #1c151a;
+  --bg-b: #2a1a24;
+  --bg-c: #120e13;
+  --mood-accent: #e8927c;
+  --mood-ink: #f7efe6;
+}
+[data-mood='calm'] {
+  --bg-a: #141a15;
+  --bg-b: #1c271e;
+  --bg-c: #0c120d;
+  --mood-accent: #8baf7f;
+  --mood-ink: #edf5eb;
+}
+[data-mood='celebration'] {
+  --bg-a: #201316;
+  --bg-b: #32181e;
+  --bg-c: #130a0c;
+  --mood-accent: #e8927c;
+  --mood-ink: #fdf2ee;
+}
+[data-mood='night'] {
+  --bg-a: #13100e;
+  --bg-b: #1e1713;
+  --bg-c: #090706;
+  --mood-accent: #e8c27e;
+  --mood-ink: #fdf5ea;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--mood-ink, #f7efe6);
+  background: var(--bg-a, #1a1512);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.mood-surface {
+  background-color: var(--bg-a, #1a1512);
+  background-image:
+    radial-gradient(115% 85% at 12% 0%, var(--bg-b, #281d17) 0%, transparent 58%),
+    radial-gradient(100% 80% at 88% 100%, var(--bg-c, #140d0a) 0%, transparent 62%);
+  color: var(--mood-ink, #f7efe6);
+  transition: background-color 900ms var(--ease-soft);
+}
+
+/* Faint paper texture so cards read as physical, not flat. */
+.paper-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.14'/%3E%3C/svg%3E");
+}
+
+.hand {
+  font-family: var(--font-hand);
+}
+.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Crisp text: kill sub-pixel blur from transforms + thin variable fonts. */
+.display,
+h1,
+h2,
+h3 {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  /* Taller line-box + slight tracking reads sharper in screenshots than tight 1.05 */
+  letter-spacing: 0.005em;
+}
+
+/* Headline weight — Fraunces Variable defaults too light and photographs as "blur". */
+.display {
+  font-weight: 650;
+}
+
+/* Reveal headline used on the birthday screen: keep it fully opaque and dark. */
+.birthday-title {
+  color: #2e2622;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Bottom-right "next" pill: it sits over animated petals, so give it a solid
+   dark plate. A translucent plate over moving confetti reads as blur. */
+.next-pill {
+  background-color: #221c18;
+  color: #fdf5ea;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.7);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Never let animated text sit on a fractional pixel; forces a clean raster. */
+.crisp-text {
+  /* Do not force a composited layer: on some browsers it rasterizes text softly. */
+  backface-visibility: visible;
+  transform: none;
+  filter: none;
+  -webkit-filter: none;
+}
+
+/* Photos: never upscale beyond their pixels; let the browser keep edges sharp. */
+.crisp-img {
+  image-rendering: auto;
+  -webkit-user-drag: none;
+}
+
+/* Hero photo: cap at its natural pixels and keep the card opaque so the
+   cream page behind it cannot bleed through and soften edges. */
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tap {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+::selection {
+  background: #f6b58a;
+  color: #2e2622;
+}
+
+:focus-visible {
+  outline: 2px dashed var(--mood-accent, #e8927c);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Ambient motion. Every one of these is decorative and additive \u2014 none of
+ * them are load-bearing for understanding the page.
+ * ------------------------------------------------------------------ */
+@keyframes petal-fall {
+  0% {
+    transform: translate3d(0, -14vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--petal-opacity, 0.9);
+  }
+  100% {
+    transform: translate3d(var(--drift, 40px), 114vh, 0) rotate(var(--spin, 320deg));
+    opacity: 0;
+  }
+}
+.petal {
+  animation: petal-fall var(--fall-duration, 11s) linear var(--fall-delay, 0s) infinite;
+  will-change: transform;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(var(--spin, 540deg));
+    opacity: 0.85;
+  }
+}
+.confetti-piece {
+  animation: confetti-fall var(--fall-duration, 2.8s) cubic-bezier(0.28, 0.62, 0.5, 1)
+    var(--fall-delay, 0s) forwards;
+  will-change: transform;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.15);
+  }
+}
+.sparkle {
+  animation: twinkle var(--twinkle-duration, 2.4s) ease-in-out var(--twinkle-delay, 0s) infinite;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+.float-soft {
+  animation: float-soft 4.6s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+.breathe {
+  animation: breathe 5.5s ease-in-out infinite;
+}
+
+@keyframes shake-hard {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  10% {
+    transform: translate3d(-9px, 4px, 0) rotate(-0.7deg);
+  }
+  26% {
+    transform: translate3d(8px, -5px, 0) rotate(0.6deg);
+  }
+  42% {
+    transform: translate3d(-7px, -3px, 0) rotate(-0.5deg);
+  }
+  58% {
+    transform: translate3d(7px, 5px, 0) rotate(0.45deg);
+  }
+  74% {
+    transform: translate3d(-4px, 2px, 0) rotate(-0.3deg);
+  }
+  88% {
+    transform: translate3d(3px, -2px, 0) rotate(0.2deg);
+  }
+}
+.shaking {
+  animation: shake-hard 640ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scale(1) translateY(0) skewX(0deg);
+    opacity: 0.96;
+  }
+  35% {
+    transform: scale(1.1, 0.93) translateY(-1px) skewX(3deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.95, 1.06) translateY(1px) skewX(-3deg);
+    opacity: 0.88;
+  }
+}
+.flame {
+  animation: flame-flicker 900ms ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(232, 146, 124, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(232, 146, 124, 0);
+  }
+}
+.glow-pulse {
+  animation: glow-pulse 2.4s ease-out infinite;
+}
+
+@keyframes suno-zoom {
+  0% {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+.suno-zoom {
+  animation: suno-zoom 3.4s var(--ease-soft) forwards;
+}
+
+/* Respect the reader. */
+@media (prefers-reduced-motion: reduce) {
+  .petal,
+  .confetti-piece,
+  .sparkle,
+  .float-soft,
+  .breathe,
+  .shaking,
+  .flame,
+  .glow-pulse,
+  .suno-zoom {
+    animation: none !important;
+  }
+}
