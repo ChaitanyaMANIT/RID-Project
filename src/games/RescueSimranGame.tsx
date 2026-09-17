@@ -104,7 +104,7 @@ export default function RescueSimranGame() {
   const coinSetRef = useRef(new Set<number>())
   const [phase, setPhase] = useState<Phase>('intro')
   const [view, setView] = useState<GameState>(freshState())
-  const [message, setMessage] = useState(VOICE.villainTaunt)
+  const [message, setMessage] = useState<string>(VOICE.villainTaunt)
 
   const resetGame = useCallback(() => {
     stateRef.current = freshState()
